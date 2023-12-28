@@ -2,6 +2,8 @@ package com.deepak.queue.model;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -22,48 +24,51 @@ public class QueueInformation {
 
     @Id
     @Hidden
-    @Schema(description = "AutogenerateID")
+    @Schema(description = "Auto-generated ID")
     private int id;
 
-    @Column("QueueID")
-    private int queueID;
+    @Column("queue_id")
+    private int queueId;
 
-    @Column("CurrentQueueID")
-    private int currentQueueID;
+    @Column("current_queue_id")
+    private int currentQueueId;
 
-    @Column("QueueStartTime")
+    @Column("queue_start_time")
     private LocalDateTime queueStartTime;
 
-    @Column("UserName")
+    @Column("user_name")
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
-    @Column("PhoneNumber")
+    @Column("phone_number")
+    @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+    @NotBlank(message = "PhoneNumber cannot be blank")
     private String phoneNumber;
 
-    @Column("UserId")
+    @Column("user_id")
     private String userId;
 
-    @Column("ClinicId")
+    @Column("clinic_id")
     private String clinicId;
 
-    @Column("AppointmentId")
+    @Column("appointment_id")
     private String appointmentId;
 
-    @Column("AppointmentStatus")
+    @Column("appointment_status")
     private Boolean appointmentStatus;
 
-    @Column("AdvancePaidForQueue")
+    @Column("advance_paid_for_queue")
     private Boolean advancePaidForQueue;
 
-    @Column("FollowupConsultation")
+    @Column("followup_consultation")
     private Boolean followupConsultation;
 
-    @Column("AppointmentSource")
+    @Column("appointment_source")
     private String appointmentSource;
 
-    @Column("DoctorName")
+    @Column("doctor_name")
     private String doctorName;
 
-    @Column("PatentReachedClinic")
-    private Boolean patentReachedClinic;
+    @Column("patient_reached_clinic")
+    private Boolean patientReachedClinic;
 }

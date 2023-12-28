@@ -7,6 +7,8 @@ import reactor.core.publisher.Mono;
 
 public interface QueueService {
 
+    Flux<QueueInformation> getPaginatedQueueInformation(int page, int size);
+
     Flux<QueueInformation> getAllQueueInformation();
 
     Mono<QueueInformation> getQueueInformationById(int id);

@@ -3,6 +3,9 @@ package com.deepak.queue.service;
 import com.deepak.queue.model.QueueInformation;
 import com.deepak.queue.repository.QueueInformationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,6 +28,12 @@ public class QueueServiceImpl implements QueueService {
     }
 
     @Override
+    public Flux<QueueInformation> getPaginatedQueueInformation(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return queueInformationRepository.findAllBy(pageable);
+    }
+
+    @Override
     public Mono<QueueInformation> getQueueInformationById(int id) {
         return queueInformationRepository.findById(id);
     }
@@ -40,19 +49,45 @@ public class QueueServiceImpl implements QueueService {
     public Mono<QueueInformation> updateQueueInformation(int id, Mono<QueueInformation> queueInformationMono) {
         return queueInformationRepository.findById(id)
                 .flatMap(existingQueueInfo -> queueInformationMono.map(updatedQueueInfo -> {
-                    existingQueueInfo.setQueueID(updatedQueueInfo.getQueueID());
-                    existingQueueInfo.setCurrentQueueID(updatedQueueInfo.getCurrentQueueID());
-                    existingQueueInfo.setName(updatedQueueInfo.getName());
-                    existingQueueInfo.setPhoneNumber(updatedQueueInfo.getPhoneNumber());
-                    existingQueueInfo.setUserId(updatedQueueInfo.getUserId());
-                    existingQueueInfo.setClinicId(updatedQueueInfo.getClinicId());
-                    existingQueueInfo.setAppointmentId(updatedQueueInfo.getAppointmentId());
-                    existingQueueInfo.setAppointmentStatus(updatedQueueInfo.getAppointmentStatus());
-                    existingQueueInfo.setAdvancePaidForQueue(updatedQueueInfo.getAdvancePaidForQueue());
-                    existingQueueInfo.setFollowupConsultation(updatedQueueInfo.getFollowupConsultation());
-                    existingQueueInfo.setAppointmentSource(updatedQueueInfo.getAppointmentSource());
-                    existingQueueInfo.setDoctorName(updatedQueueInfo.getDoctorName());
-                    existingQueueInfo.setPatentReachedClinic(updatedQueueInfo.getPatentReachedClinic());
+                    if (updatedQueueInfo.getQueueId() != 0) {
+                        existingQueueInfo.setQueueId(updatedQueueInfo.getQueueId());
+                    }
+                    if (updatedQueueInfo.getCurrentQueueId() != 0) {
+                        existingQueueInfo.setCurrentQueueId(updatedQueueInfo.getCurrentQueueId());
+                    }
+                    if (updatedQueueInfo.getName() != null && !updatedQueueInfo.getName().isEmpty()) {
+                        existingQueueInfo.setName(updatedQueueInfo.getName());
+                    }
+                    if (updatedQueueInfo.getPhoneNumber() != null && !updatedQueueInfo.getPhoneNumber().isEmpty()) {
+                        existingQueueInfo.setPhoneNumber(updatedQueueInfo.getPhoneNumber());
+                    }
+                    if (updatedQueueInfo.getUserId() != null && !updatedQueueInfo.getUserId().isEmpty()) {
+                        existingQueueInfo.setUserId(updatedQueueInfo.getUserId());
+                    }
+                    if (updatedQueueInfo.getClinicId() != null && !updatedQueueInfo.getClinicId().isEmpty()) {
+                        existingQueueInfo.setClinicId(updatedQueueInfo.getClinicId());
+                    }
+                    if (updatedQueueInfo.getAppointmentId() != null && !updatedQueueInfo.getAppointmentId().isEmpty()) {
+                        existingQueueInfo.setAppointmentId(updatedQueueInfo.getAppointmentId());
+                    }
+                    if (updatedQueueInfo.getAppointmentStatus() != null) {
+                        existingQueueInfo.setAppointmentStatus(updatedQueueInfo.getAppointmentStatus());
+                    }
+                    if (updatedQueueInfo.getAdvancePaidForQueue() != null) {
+                        existingQueueInfo.setAdvancePaidForQueue(updatedQueueInfo.getAdvancePaidForQueue());
+                    }
+                    if (updatedQueueInfo.getFollowupConsultation() != null) {
+                        existingQueueInfo.setFollowupConsultation(updatedQueueInfo.getFollowupConsultation());
+                    }
+                    if (updatedQueueInfo.getAppointmentSource() != null) {
+                        existingQueueInfo.setAppointmentSource(updatedQueueInfo.getAppointmentSource());
+                    }
+                    if (updatedQueueInfo.getDoctorName() != null) {
+                        existingQueueInfo.setDoctorName(updatedQueueInfo.getDoctorName());
+                    }
+                    if (updatedQueueInfo.getPatientReachedClinic() != null) {
+                        existingQueueInfo.setPatientReachedClinic(updatedQueueInfo.getPatientReachedClinic());
+                    }
                     return existingQueueInfo;
                 }))
                 .flatMap(queueInformationRepository::save);
