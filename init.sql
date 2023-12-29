@@ -1,32 +1,52 @@
+DROP DATABASE QueueManagement;
 CREATE DATABASE IF NOT EXISTS QueueManagement;
 USE QueueManagement;
+DROP TABLE QueueInformation;
+DROP TABLE ClinicInformation;
+DROP TABLE ClinicPhoneNumbers;
+DROP TABLE DoctorInformation;
+DROP TABLE DoctorShiftAvailability;
 
+-- Main Table For Storing Queue Details
+-- TABLE 1 ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS QueueInformation (
                                                 id INT AUTO_INCREMENT PRIMARY KEY,
-                                                queue_id INT NOT NULL,
-                                                current_queue_id INT NOT NULL,
-                                                queue_start_time TIMESTAMP NOT NULL,
-                                                user_name VARCHAR(255),
-                                                user_id VARCHAR(255),
-                                                phone_number VARCHAR(20),
-                                                clinic_id VARCHAR(50),
-                                                appointment_id VARCHAR(50),
-                                                appointment_status TINYINT(1),
-                                                advance_paid_for_queue TINYINT(1),
-                                                followup_consultation TINYINT(1),
-                                                appointment_source VARCHAR(100),
-                                                doctor_name VARCHAR(100),
-                                                patient_reached_clinic TINYINT(1)
+                                                QueueID INT NOT NULL,
+                                                CurrentQueueID INT NOT NULL,
+                                                QueueStartTime TIMESTAMP NOT NULL,
+                                                UserName VARCHAR(255),
+                                                UserId VARCHAR(255),
+                                                PhoneNumber VARCHAR(20),
+                                                ClinicId VARCHAR(50),
+                                                RequestedAppointmentDate TIMESTAMP,
+                                                JoinTheQueue TINYINT(1),
+
+                                                AppointmentId VARCHAR(50),
+                                                AppointmentStatus TINYINT(1),
+                                                AdvancePaidForQueue TINYINT(1),
+                                                FollowupConsultation TINYINT(1),
+                                                AppointmentSource VARCHAR(100),
+                                                DoctorName VARCHAR(100),
+                                                PatentReachedClinic TINYINT(1)
 );
+
+ALTER TABLE QueueInformation
+ADD CONSTRAINT fk_queue_clinic
+FOREIGN KEY (ClinicId) REFERENCES ClinicInformation(ClinicId);
+
+CREATE INDEX idx_clinicid ON QueueInformation(ClinicId);
+
 -- Inserting sample data into QueueInformation table
 INSERT INTO QueueInformation (
     QueueID,
     CurrentQueueID,
     QueueStartTime,
     UserName,
-    PhoneNumber,
     UserId,
+    PhoneNumber,
     ClinicId,
+    RequestedAppointmentDate,
+    JoinTheQueue,
     AppointmentId,
     AppointmentStatus,
     AdvancePaidForQueue,
@@ -35,77 +55,83 @@ INSERT INTO QueueInformation (
     DoctorName,
     PatentReachedClinic
 ) VALUES
-      (1, 1, '2023-12-28 09:00:00', 'John Doe', '123-456-7890', 'user123', 'clinic1', 'app123', 1, 1, 0, 'Online', 'Dr. Smith', 1),
-      (2, 2, '2023-12-29 10:30:00', 'Jane Smith', '987-654-3210', 'user456', 'clinic2', 'app456', 0, 0, 1, 'In-person', 'Dr. Johnson', 0),
-      (3, 3, '2023-12-30 11:45:00', 'Alice Brown', '555-123-4567', 'user789', 'clinic3', 'app789', 1, 1, 1, 'Referral', 'Dr. Williams', 1);
--- Onboarding
+   (1, 1, '2023-03-01 09:00:00', 'John Doe', 'user123', '123-456-7890', 'clinic1', '2023-03-01', 1, 'app123', 1, 1, 0, 'Online', 'Dr. Smith', 1),
+
+   (2, 2, '2023-03-02 10:30:00', 'Jane Smith', 'user456', '987-654-3210', 'clinic2', '2023-03-02', 1, 'app456', 0, 0, 1, 'In-person', 'Dr. Johnson', 0),
+
+   (3, 3, '2023-03-03 11:45:00', 'Alice Brown', 'user789', '555-123-4567', 'clinic3', '2023-03-03', 0, 'app789', 1, 1, 1, 'Referral', 'Dr. Williams', 1);
+
+-- TABLE 2 ----------------------------------------------------------------------------
+-- Onboarding - Clinic Information
+
+-- ClinicInformation table definition
 CREATE TABLE IF NOT EXISTS ClinicInformation (
-                                   ClinicId INT PRIMARY KEY,
-                                   ClinicName VARCHAR(100),
-                                   ClinicAddress VARCHAR(255),
-                                   Latitude DECIMAL(10, 8), -- Precision up to 8 decimal places for latitude
-                                   Longitude DECIMAL(11, 8), -- Precision up to 8 decimal places for longitude
-                                   ClinicPinCode VARCHAR(10),
-                                   ClinicPhoneNumbers VARCHAR(255), -- Storing phone numbers as a comma-separated string
-                                   NoOfDoctors INT
+    ClinicId INT AUTO_INCREMENT PRIMARY KEY,
+    ClinicName VARCHAR(100),
+    ClinicAddress VARCHAR(255),
+    Latitude DECIMAL(10, 8),
+    Longitude DECIMAL(11, 8),
+    ClinicPinCode VARCHAR(10),
+    NoOfDoctors INT
 );
 
-INSERT INTO ClinicInformation (ClinicId, ClinicName, ClinicAddress, Latitude, Longitude, ClinicPinCode, ClinicPhoneNumbers, NoOfDoctors)
+-- Inserting sample clinic information
+INSERT INTO ClinicInformation (ClinicName, ClinicAddress, Latitude, Longitude, ClinicPinCode, NoOfDoctors)
 VALUES
-    (1, 'Sample Clinic 1', '123 Sample St', 40.7128, -74.0060, '12345', '123-456-7890, 987-654-3210', 5),
-    (2, 'Sample Clinic 2', '456 Test Ave', 34.0522, -118.2437, '54321', '111-222-3333, 444-555-6666', 8),
-    (3, 'Sample Clinic 3', '789 Example Rd', 51.5074, -0.1278, '67890', '777-888-9999, 999-888-7777', 3);
+('Sample Clinic 1', '123 Sample St', 40.7128, -74.0060, '12345', 5),
+('Sample Clinic 2', '456 Test Ave', 34.0522, -118.2437, '54321', 8),
+('Sample Clinic 3', '789 Example Rd', 51.5074, -0.1278, '67890', 3);
 
-CREATE TABLE IF NOT EXISTS DoctorInformation (
-                                   PKId INT AUTO_INCREMENT PRIMARY KEY,
-                                   DoctorId INT,
-                                   ClinicId INT,
-                                   DoctorName VARCHAR(100),
-                                   AvailableDays VARCHAR(50),
-                                   TimeOfDay ENUM('MORNING', 'AFTERNOON', 'EVENING'),
-                                   StartTime TIME,
-                                   EndTime TIME
+-- ClinicPhoneNumbers table definition
+
+CREATE TABLE IF NOT EXISTS ClinicPhoneNumbers (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    ClinicId INT,
+    PhoneNumber VARCHAR(20),
+    FOREIGN KEY (ClinicId) REFERENCES ClinicInformation(ClinicId)
 );
+
+-- Inserting phone numbers for clinics
+INSERT INTO ClinicPhoneNumbers (ClinicId, PhoneNumber) VALUES
+(1, '+1234567890'),
+(1, '+1987654321'),
+(2, '+1555123456');
+
+
+-- TABLE 4 ----------------------------------------------------------------------------
 -- Onboarding + Doctor Management through APP
-INSERT INTO DoctorInformation (DoctorId, ClinicId, DoctorName, AvailableDays, TimeOfDay, StartTime, EndTime)
-VALUES
-    (1, 1, 'Dr. Smith', 'MON,TUE,WED', 'MORNING', '08:00:00', '12:00:00'),
-    (2, 1, 'Dr. Johnson', 'TUE,WED,THU', 'AFTERNOON', '13:00:00', '17:00:00'),
-    (3, 2, 'Dr. Williams', 'WED,THU,FRI', 'EVENING', '18:00:00', '20:00:00');
-
-CREATE TABLE IF NOT EXISTS DoctorAvailabilityInformation (
-                                               PK INT AUTO_INCREMENT PRIMARY KEY,
-                                               ClinicId INT,
-                                               DoctorId INT,
-                                               AppointmentDate DATE,
-                                               StartTime TIME,
-                                               EndTime TIME,
-                                               AvailableForAppointment BOOLEAN DEFAULT FALSE
+CREATE TABLE IF NOT EXISTS DoctorInformation (
+    DoctorId INT AUTO_INCREMENT PRIMARY KEY,
+    ClinicId INT,
+    DoctorName VARCHAR(100),
+    AvailableDays VARCHAR(50),
+    TimeOfDay ENUM('MORNING', 'AFTERNOON', 'EVENING'),
+    StartTime TIME,
+    EndTime TIME,
+    FOREIGN KEY (ClinicId) REFERENCES ClinicInformation(ClinicId)
 );
--- Inserting sample data into DoctorAvailabilityInformation table Create Entries Using Batch Jobs & Also for Input for Queue Management & appointment 
-INSERT INTO DoctorAvailabilityInformation (ClinicId, DoctorId, AppointmentDate, StartTime, EndTime, AvailableForAppointment)
-VALUES
-    (1, 101, '2023-12-28', '09:00:00', '12:00:00', TRUE),
-    (2, 102, '2023-12-29', '13:30:00', '15:30:00', TRUE),
-    (3, 103, '2023-12-30', '10:00:00', '11:30:00', FALSE),
-    (1, 101, '2023-12-31', '14:00:00', '16:00:00', TRUE),
-    (2, 104, '2024-01-01', '11:00:00', '13:00:00', FALSE);
 
+INSERT INTO DoctorInformation (ClinicId, DoctorName, AvailableDays, TimeOfDay, StartTime, EndTime)
+VALUES
+(1, 'Dr. Smith', 'MON', 'MORNING', '08:00:00', '12:00:00'),
+(1, 'Dr. Smith', 'THU', 'AFTERNOON', '13:00:00', '18:00:00'),
+(2, 'Dr. Mary', 'MON,WED,FRI', 'MORNING', '09:00:00', '12:00:00');
+
+-- TABLE 5 ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS DoctorShiftAvailability (
-                                         PK INT AUTO_INCREMENT PRIMARY KEY,
-                                         ClinicId INT,
-                                         DoctorId INT,
-                                         AppointmentDate DATE,
-                                         MorningAvailability BOOLEAN DEFAULT FALSE,
-                                         AfternoonAvailability BOOLEAN DEFAULT FALSE,
-                                         EveningAvailability BOOLEAN DEFAULT FALSE,
-                                         ReasonMessage VARCHAR(255)
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    DoctorId INT,
+    ClinicId INT,
+    ShiftDate DATE,
+    ShiftStartTime TIME,
+    ShiftEndTime TIME,
+    Availability BOOLEAN,
+    FOREIGN KEY (DoctorId) REFERENCES DoctorInformation(DoctorId),
+    FOREIGN KEY (ClinicId) REFERENCES DoctorInformation(ClinicId)
 );
--- Inserting sample data into DoctorShiftAvailability table To Record Absence -  Doctor Management through APP
-INSERT INTO DoctorShiftAvailability (ClinicId, DoctorId, AppointmentDate, MorningAvailability, AfternoonAvailability, EveningAvailability, ReasonMessage)
+
+INSERT INTO DoctorShiftAvailability (DoctorId, ClinicId, ShiftDate, ShiftStartTime, ShiftEndTime, Availability)
 VALUES
-    (1, 101, '2023-12-28', TRUE, TRUE, FALSE, 'Regular shift'),
-    (2, 102, '2023-12-29', TRUE, FALSE, TRUE, 'Morning appointment scheduled'),
-    (3, 103, '2023-12-30', FALSE, TRUE, TRUE, 'Doctor on leave'),
-    (1, 101, '2023-12-31', FALSE, FALSE, FALSE, 'Holiday'),
-    (2, 104, '2024-01-01', FALSE, FALSE, TRUE, 'Evening shift only');
+(1, 1, '2023-03-01', '08:00:00', '12:00:00', TRUE),
+(1, 1, '2023-03-02', '13:00:00', '18:00:00', FALSE),
+(2, 2, '2023-03-01', '09:00:00', '12:00:00', TRUE);

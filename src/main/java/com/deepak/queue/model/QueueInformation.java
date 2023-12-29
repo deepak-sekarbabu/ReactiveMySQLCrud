@@ -27,48 +27,54 @@ public class QueueInformation {
     @Schema(description = "Auto-generated ID")
     private int id;
 
-    @Column("queue_id")
+    @Column("QueueID")
     private int queueId;
 
-    @Column("current_queue_id")
+    @Column("CurrentQueueID")
     private int currentQueueId;
 
-    @Column("queue_start_time")
+    @Column("QueueStartTime")
     private LocalDateTime queueStartTime;
 
-    @Column("user_name")
+    @Column("UserName")
     @NotBlank(message = "Name cannot be blank")
     private String name;
 
-    @Column("phone_number")
+    @Column("PhoneNumber")
     @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
     @NotBlank(message = "PhoneNumber cannot be blank")
     private String phoneNumber;
 
-    @Column("user_id")
+    @Column("UserId")
     private String userId;
 
-    @Column("clinic_id")
+    @Column("ClinicId")
     private String clinicId;
 
-    @Column("appointment_id")
+    @Column("RequestedAppointmentDate")
+    private LocalDateTime requestedAppointmentDate;
+
+    @Column("JoinTheQueue")
+    private boolean joinTheQueue;
+
+    @Column("AppointmentId")
     private String appointmentId;
 
-    @Column("appointment_status")
+    @Column("AppointmentStatus")
     private Boolean appointmentStatus;
 
-    @Column("advance_paid_for_queue")
+    @Column("AdvancePaidForQueue")
     private Boolean advancePaidForQueue;
 
-    @Column("followup_consultation")
+    @Column("FollowupConsultation")
     private Boolean followupConsultation;
 
-    @Column("appointment_source")
+    @Column("AppointmentSource")
     private String appointmentSource;
 
-    @Column("doctor_name")
+    @Column("DoctorName")
     private String doctorName;
 
-    @Column("patient_reached_clinic")
+    @Column("PatentReachedClinic")
     private Boolean patientReachedClinic;
 }
