@@ -43,32 +43,33 @@ public class GlobalExceptionHandler {
 
         List<String> errors = new ArrayList<>();
 
-        if (ex instanceof MethodArgumentNotValidException) {
-            MethodArgumentNotValidException validationException = (MethodArgumentNotValidException) ex;
-            errors = validationException.getBindingResult()
+        switch (ex) {
+            case MethodArgumentNotValidException validationException -> errors = validationException.getBindingResult()
                     .getFieldErrors()
                     .stream()
                     .map(error -> error.getField() + ": " + error.getDefaultMessage())
                     .collect(Collectors.toList());
-        } else if (ex instanceof WebExchangeBindException) {
-            WebExchangeBindException bindException = (WebExchangeBindException) ex;
-            errors = bindException.getBindingResult()
+            case WebExchangeBindException bindException -> errors = bindException.getBindingResult()
                     .getFieldErrors()
                     .stream()
                     .map(error -> error.getField() + ": " + error.getDefaultMessage())
                     .collect(Collectors.toList());
-        } else if (ex instanceof ResponseStatusException) {
-            if (((ResponseStatusException) ex).getStatusCode().value() == 404) {
-                status = HttpStatus.NOT_FOUND;
-                errors.add("Not Found");
-            } else {
-                errors.add(((ResponseStatusException) ex).getReason());
+            case ResponseStatusException responseStatusException -> {
+                if (responseStatusException.getStatusCode().value() == 404) {
+                    status = HttpStatus.NOT_FOUND;
+                    if (((ResponseStatusException) ex).getReason() != null) {
+                        errors.add(((ResponseStatusException) ex).getReason());
+                    } else {
+                        errors.add("Not Found");
+                    }
+                } else {
+                    errors.add(((ResponseStatusException) ex).getReason());
+                }
             }
-
-        } else {
-            // Handle other validation-related exceptions here
-            // For example, if ValidationException is another custom exception
-            errors.add(ex.getMessage()); // Add the exception message to errors
+            case null, default ->
+                // Handle other validation-related exceptions here
+                // For example, if ValidationException is another custom exception
+                    errors.add(ex.getMessage()); // Add the exception message to errors
         }
 
         body.put("status", status.value());

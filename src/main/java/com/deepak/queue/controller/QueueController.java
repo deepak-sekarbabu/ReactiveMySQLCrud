@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/queue-information")
-@Tag(name = "Queue Information", description = "Handles CRUD operations for Queue Handling")
+@Tag(name = "Queue Service", description = "Handles CRUD operations for Queue Handling")
 public class QueueController {
 
     private final QueueService service;

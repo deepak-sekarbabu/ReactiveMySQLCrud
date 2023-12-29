@@ -38,15 +38,15 @@ public class QueueInformation {
 
     @Column("UserName")
     @NotBlank(message = "Name cannot be blank")
-    private String name;
+    private String userName;
+
+    @Column("UserId")
+    private String userId;
 
     @Column("PhoneNumber")
     @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
     @NotBlank(message = "PhoneNumber cannot be blank")
     private String phoneNumber;
-
-    @Column("UserId")
-    private String userId;
 
     @Column("ClinicId")
     private String clinicId;
@@ -55,7 +55,7 @@ public class QueueInformation {
     private LocalDateTime requestedAppointmentDate;
 
     @Column("JoinTheQueue")
-    private boolean joinTheQueue;
+    private Boolean joinTheQueue;
 
     @Column("AppointmentId")
     private String appointmentId;
@@ -72,8 +72,8 @@ public class QueueInformation {
     @Column("AppointmentSource")
     private String appointmentSource;
 
-    @Column("DoctorName")
-    private String doctorName;
+    @Column("DoctorId")
+    private String doctorId;
 
     @Column("PatentReachedClinic")
     private Boolean patientReachedClinic;

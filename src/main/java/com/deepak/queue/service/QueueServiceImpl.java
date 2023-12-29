@@ -55,8 +55,8 @@ public class QueueServiceImpl implements QueueService {
                     if (updatedQueueInfo.getCurrentQueueId() != 0) {
                         existingQueueInfo.setCurrentQueueId(updatedQueueInfo.getCurrentQueueId());
                     }
-                    if (updatedQueueInfo.getName() != null && !updatedQueueInfo.getName().isEmpty()) {
-                        existingQueueInfo.setName(updatedQueueInfo.getName());
+                    if (updatedQueueInfo.getUserName() != null && !updatedQueueInfo.getUserName().isEmpty()) {
+                        existingQueueInfo.setUserName(updatedQueueInfo.getUserName());
                     }
                     if (updatedQueueInfo.getPhoneNumber() != null && !updatedQueueInfo.getPhoneNumber().isEmpty()) {
                         existingQueueInfo.setPhoneNumber(updatedQueueInfo.getPhoneNumber());
@@ -82,8 +82,8 @@ public class QueueServiceImpl implements QueueService {
                     if (updatedQueueInfo.getAppointmentSource() != null) {
                         existingQueueInfo.setAppointmentSource(updatedQueueInfo.getAppointmentSource());
                     }
-                    if (updatedQueueInfo.getDoctorName() != null) {
-                        existingQueueInfo.setDoctorName(updatedQueueInfo.getDoctorName());
+                    if (updatedQueueInfo.getDoctorId() != null) {
+                        existingQueueInfo.setDoctorId(updatedQueueInfo.getDoctorId());
                     }
                     if (updatedQueueInfo.getPatientReachedClinic() != null) {
                         existingQueueInfo.setPatientReachedClinic(updatedQueueInfo.getPatientReachedClinic());
