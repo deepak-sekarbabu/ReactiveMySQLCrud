@@ -29,13 +29,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleException(Exception ex) {
         LOGGER.error("An error occurred: {}", ex.getMessage());
         ex.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("An error occurred. Please try again later.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred. Please try again later.");
     }
 
-    @ExceptionHandler({ValidationException.class, WebExchangeBindException.class,
-            MethodArgumentNotValidException.class, ResponseStatusException.class,
-            ConstraintViolationException.class})
+    @ExceptionHandler({ValidationException.class, WebExchangeBindException.class, MethodArgumentNotValidException.class, ResponseStatusException.class, ConstraintViolationException.class})
     public ResponseEntity<Object> handleValidationExceptions(Exception ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now().format(formatter));
@@ -44,16 +41,10 @@ public class GlobalExceptionHandler {
         List<String> errors = new ArrayList<>();
 
         switch (ex) {
-            case MethodArgumentNotValidException validationException -> errors = validationException.getBindingResult()
-                    .getFieldErrors()
-                    .stream()
-                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                    .collect(Collectors.toList());
-            case WebExchangeBindException bindException -> errors = bindException.getBindingResult()
-                    .getFieldErrors()
-                    .stream()
-                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                    .collect(Collectors.toList());
+            case MethodArgumentNotValidException validationException ->
+                    errors = validationException.getBindingResult().getFieldErrors().stream().map(error -> error.getField() + ": " + error.getDefaultMessage()).collect(Collectors.toList());
+            case WebExchangeBindException bindException ->
+                    errors = bindException.getBindingResult().getFieldErrors().stream().map(error -> error.getField() + ": " + error.getDefaultMessage()).collect(Collectors.toList());
             case ResponseStatusException responseStatusException -> {
                 if (responseStatusException.getStatusCode().value() == 404) {
                     status = HttpStatus.NOT_FOUND;
@@ -67,9 +58,13 @@ public class GlobalExceptionHandler {
                 }
             }
             case null, default ->
-                // Handle other validation-related exceptions here
-                // For example, if ValidationException is another custom exception
-                    errors.add(ex.getMessage()); // Add the exception message to errors
+            // Handle other validation-related exceptions here
+            // For example, if ValidationException is another custom exception
+            {
+                if (ex != null) {
+                    errors.add(ex.getMessage());
+                }
+            } // Add the exception message to errors
         }
 
         body.put("status", status.value());

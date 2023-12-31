@@ -2,7 +2,6 @@ package com.deepak.queue.service;
 
 import com.deepak.queue.model.QueueInformation;
 import com.deepak.queue.repository.QueueInformationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,37 +16,37 @@ public class QueueServiceImpl implements QueueService {
 
     private final QueueInformationRepository queueInformationRepository;
 
-    @Autowired
     public QueueServiceImpl(QueueInformationRepository queueInformationRepository) {
         this.queueInformationRepository = queueInformationRepository;
     }
 
     @Override
     public Flux<QueueInformation> getAllQueueInformation() {
-        return queueInformationRepository.findAll();
+        return this.queueInformationRepository.findAll();
     }
 
     @Override
     public Flux<QueueInformation> getPaginatedQueueInformation(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        return queueInformationRepository.findAllBy(pageable);
+        return this.queueInformationRepository.findAllBy(pageable);
     }
 
     @Override
     public Mono<QueueInformation> getQueueInformationById(int id) {
-        return queueInformationRepository.findById(id);
+        return this.queueInformationRepository.findById(id);
     }
 
+    @Override
     public Mono<QueueInformation> createQueueInformation(Mono<QueueInformation> queueInformationMono) {
         return queueInformationMono.flatMap(queueInformation -> {
             queueInformation.setQueueStartTime(LocalDateTime.now());
-            return queueInformationRepository.save(queueInformation);
+            return this.queueInformationRepository.save(queueInformation);
         });
     }
 
     @Override
     public Mono<QueueInformation> updateQueueInformation(int id, Mono<QueueInformation> queueInformationMono) {
-        return queueInformationRepository.findById(id)
+        return this.queueInformationRepository.findById(id)
                 .flatMap(existingQueueInfo -> queueInformationMono.map(updatedQueueInfo -> {
                     if (updatedQueueInfo.getQueueId() != 0) {
                         existingQueueInfo.setQueueId(updatedQueueInfo.getQueueId());
@@ -90,12 +89,11 @@ public class QueueServiceImpl implements QueueService {
                     }
                     return existingQueueInfo;
                 }))
-                .flatMap(queueInformationRepository::save);
+                .flatMap(this.queueInformationRepository::save);
     }
-
 
     @Override
     public Mono<Void> deleteQueueInformation(int id) {
-        return queueInformationRepository.deleteById(id);
+        return this.queueInformationRepository.deleteById(id);
     }
 }

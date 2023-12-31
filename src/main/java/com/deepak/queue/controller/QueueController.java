@@ -3,7 +3,6 @@ package com.deepak.queue.controller;
 import com.deepak.queue.model.QueueInformation;
 import com.deepak.queue.service.QueueService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,16 +32,20 @@ public class QueueController {
     }
 
     @Operation(summary = "Get all queue information")
-    @GetMapping({"/{page}/{size}"})
     @ApiResponse(responseCode = "200", description = "Information Retrieved")
     @ApiResponse(responseCode = "404", description = "Information does not exist")
+    @GetMapping("/{page}/{size}")
     public ResponseEntity<Flux<QueueInformation>> getAllQueueInformationUsingPagination(
-            @Parameter(description = "page number") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "page size") @RequestParam(defaultValue = "10") int size
+            @PathVariable int page, @PathVariable int size
     ) {
-        Flux<QueueInformation> pagedQueueInformation = service.getPaginatedQueueInformation(page, size);
+        // Set default values if page or size is 0
+        int defaultPage = (page <= 0) ? 0 : page;
+        int defaultSize = (size <= 0) ? 10 : size;
+        Flux<QueueInformation> pagedQueueInformation = service.getPaginatedQueueInformation(
+                defaultPage, defaultSize);
         return ResponseEntity.ok().body(pagedQueueInformation);
     }
+
 
     @GetMapping("/{id}")
     @Operation(summary = "Get queue information by ID")
